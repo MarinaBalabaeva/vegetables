@@ -1,0 +1,155 @@
+using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace Ovoshi
+{
+    public class Warehouse
+    {
+        private int maxCapacity;
+        private decimal fee;
+        private LinkedList<BoxContainer> boxContainers; //not just list cuz we have to work with deleting containers which is done more easily in linked list
+        private Random rand = new Random();
+        private List<string> logs;
+
+        /// <summary>
+        /// warehouse constructor
+        /// </summary>
+        /// <param name="maxCapacity">maximal capacity of the warehouse which is defined randomly</param>
+        /// <param name="fee">how much it costs to leave your box container in this warehouse</param>
+        public Warehouse(int maxCapacity, decimal fee)
+        {
+            boxContainers = new LinkedList<BoxContainer>();
+            this.maxCapacity = maxCapacity;
+            this.fee = fee;
+            logs = new List<string>();
+        }
+
+        /// <summary>
+        /// adds a container
+        /// </summary>
+        /// <param name="boxContainer">the container you are adding</param>
+        /// <returns>whether you've added or not</returns>
+        public bool AddBoxContainer(BoxContainer boxContainer)
+        {
+            if (ContainsNumber(boxContainer.Number)) //if there is already a container with such number. i dont think it is rly needed but just for paranoia
+            {
+                logs.Add($"Контейнер №{boxContainer.Number} не был добавлен: контейнер с таким номером уже есть на складе.");
+                return false;
+            }
+            boxContainer.Corrupt(Convert.ToDecimal(rand.NextDouble() * 0.5)); //if the container is too cheap
+            if(boxContainer.Price < fee)
+            {
+                logs.Add($"Контейнер №{boxContainer.Number} не был добавлен: контейнер нерентабелен.");
+                return false;
+            }
+            while (boxContainers.Count >= maxCapacity) //clears the space for the new container
+            {
+                logs.Add($"Контейнер №{boxContainers.First.Value.Number} был удален со склада для очистки места.");
+                boxContainers.RemoveFirst();
+            }
+            boxContainers.AddLast(boxContainer); //adds the container
+            logs.Add($"Контейнер №{boxContainer.Number} был добавлен на склад.");
+            return true;
+        }
+
+        /// <summary>
+        /// checks if there's a container with such number
+        /// </summary>
+        /// <param name="number">the needed number</param>
+        /// <returns>whether there is or not</returns>
+        private bool ContainsNumber(int number)
+        {
+            foreach (BoxContainer boxContainer in boxContainers)
+            {
+                if (boxContainer.Number == number)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// deletes the container
+        /// </summary>
+        /// <param name="boxContainer">the container which is to be deleted</param>
+        /// <returns>whether it was deleted or not</returns>
+        public bool RemoveContainer(BoxContainer boxContainer)
+        {
+            if (boxContainers.Contains(boxContainer)) //if there is this container
+            {
+                logs.Add($"Контейнер №{boxContainer.Number} был удален со склада.");
+                boxContainers.Remove(boxContainer);
+                return true;
+            }
+            //if there is none
+            logs.Add($"Контейнер №{boxContainer.Number} не был удален со склада: контейнера с таким номером на складе не было.");
+            return false;
+        }
+
+        /// <summary>
+        /// gets the container by its number
+        /// </summary>
+        /// <param name="number">the number of the container</param>
+        /// <returns>container</returns>
+        public BoxContainer GetBoxContainer(int number)
+        {
+            foreach (BoxContainer c in boxContainers)
+            {
+                if (c.Number == number)
+                {
+                    return c;
+                }
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// removes the container defined by its number
+        /// </summary>
+        /// <param name="number">the number of the needed container</param>
+        /// <returns>whether it was deleted or not</returns>
+        public bool RemoveContainer(int number)
+        {
+            BoxContainer container = GetBoxContainer(number);
+            if (container != null)
+            {
+                logs.Add($"Контейнер №{number} был удален со склада.");
+                boxContainers.Remove(container);
+                return true;
+            }
+            logs.Add($"Контейнер №{number} не был удален со склада: контейнера с таким номером на складе не было.");
+            return false;
+        }
+
+        /// <summary>
+        /// gets the last log from list of logs
+        /// </summary>
+        /// <returns>log</returns>
+        public string GetLastLog()
+        {
+            return logs.Count == 0 ? null : logs[logs.Count - 1];
+        }
+
+        /// <summary>
+        /// turns list of logs into an array of logs
+        /// </summary>
+        /// <returns>array of logs</returns>
+        public string[] GetLogs()
+        {
+            return logs.ToArray();
+        }
+
+        /// <summary>
+        /// gets a list of containers
+        /// </summary>
+        public List<BoxContainer> Containers
+        {
+            get
+            {
+                return new List<BoxContainer>(boxContainers);
+            }
+        }
+    }
+}
