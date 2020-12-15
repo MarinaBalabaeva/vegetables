@@ -1,0 +1,41 @@
+using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace Ovoshi
+{
+    public class Sequence
+    {
+        private int current;
+
+        /// <summary>
+        /// sets the sequence back to zero
+        /// </summary>
+        public void Reset()
+        {
+            current = 0;
+        }
+
+
+        /// <summary>
+        /// increases the state of sequence
+        /// </summary>
+        /// <returns>increased state</returns>
+        public int Next()
+        {
+            return ++current;
+        }
+
+
+        /// <summary>
+        /// returns the current state of the sequence
+        /// </summary>
+        public int Current
+        {
+            get
+            {
+                return current;
+            }
+        }
+    }
+}
