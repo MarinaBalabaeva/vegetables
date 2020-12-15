@@ -1,0 +1,16 @@
+using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace Ovoshi
+{
+    public enum ContainerUserActions
+    {
+        AddBox,
+        RemoveBox,
+        ShowLogs,
+        ShowBoxes,
+        ShowMaxMass,
+        SealAndExit
+    }
+}
