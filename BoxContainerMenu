@@ -1,0 +1,40 @@
+using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace Ovoshi
+{
+    public class BoxContainerMenu
+    {
+        /// <summary>
+        /// menu of actions possible to be done with one single container
+        /// </summary>
+        /// <returns>chosen part of the menu (enum)</returns>
+        public static ContainerUserActions ShowBoxContainerMenu()
+        {
+            Console.WriteLine("МЕНЮ РАБОТЫ С КОНТЕЙНЕРОМ");
+            Console.WriteLine();
+            Console.WriteLine("1. Добавить ящик;");
+            Console.WriteLine("2. Удалить ящик;");
+            Console.WriteLine("3. Просмотреть лог добавлений и удалений;");
+            Console.WriteLine("4. Просмотреть список ящиков;");
+            Console.WriteLine("5. Просмотреть максимальную массу контейнера;");
+            Console.WriteLine("Q - запечатывание контейнера, добавление его на склад и выход.");
+            Console.WriteLine("Введите выбранную опцию:");
+            ConsoleKeyInfo key;
+            while (true)
+            {
+                key = Console.ReadKey();
+                switch (key.Key)
+                {
+                    case ConsoleKey.D1: return ContainerUserActions.AddBox;
+                    case ConsoleKey.D2: return ContainerUserActions.RemoveBox;
+                    case ConsoleKey.D3: return ContainerUserActions.ShowLogs;
+                    case ConsoleKey.D4: return ContainerUserActions.ShowBoxes;
+                    case ConsoleKey.D5: return ContainerUserActions.ShowMaxMass;
+                    case ConsoleKey.Q: return ContainerUserActions.SealAndExit;
+                }
+            }
+        }
+    }
+}
