@@ -1,0 +1,58 @@
+using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace Ovoshi
+{
+    public class Box
+    {
+        private decimal mass;
+        private decimal pricePerKg;
+        private int number;
+
+        public decimal Mass
+        {
+            get
+            {
+                return mass;
+            }
+        }
+
+        public decimal PricePerKg
+        {
+            get
+            {
+                return pricePerKg;
+            }
+        }
+
+        public decimal Price
+        {
+            get
+            {
+                return Mass * PricePerKg;
+            }
+        }
+
+        public int Number
+        {
+            get
+            {
+                return number;
+            }
+        }
+
+        /// <summary>
+        /// box constructor
+        /// </summary>
+        /// <param name="mass">mass of the box</param>
+        /// <param name="pricePerKg">how much each kilogram costs</param>
+        /// <param name="number">number of the box</param>
+        public Box(decimal mass, decimal pricePerKg, int number)
+        {
+            this.mass = mass;
+            this.pricePerKg = pricePerKg;
+            this.number = number;
+        }
+    }
+}
