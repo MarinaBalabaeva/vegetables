@@ -1,0 +1,81 @@
+using System;
+using System.Collections.Generic;
+using System.Text;
+using System.Text.RegularExpressions;
+
+namespace Ovoshi
+{
+    public class MainMenu
+    {
+        private static Regex intRegex = new Regex("\\d+"); //for integers
+        private static Regex decimalRegex = new Regex("\\d+(?:\\.\\d+)?"); //for decimals
+
+        /// <summary>
+        /// shows title
+        /// </summary>
+        public static void ShowTitle()
+        {
+            Console.WriteLine("БАЛАБАЕВА МАРИНА, 6113-020302D");
+            Console.WriteLine("ОВОЩНОЙ СКЛАД");
+            Console.WriteLine();
+        }
+
+        /// <summary>
+        /// shows the main menu
+        /// </summary>
+        /// <returns>chosen action (enum)</returns>
+        public static MainUserActions ShowMainMenu()
+        {
+            Console.WriteLine("ГЛАВНОЕ МЕНЮ");
+            Console.WriteLine();
+            Console.WriteLine("1. Создание пустого склада;");
+            Console.WriteLine("2. Работа со складом;");
+            Console.WriteLine("3. Удаление склада;");
+            Console.WriteLine("Q. Выход.");
+            Console.WriteLine("Введите номер выбранного действия:");
+            ConsoleKeyInfo key;
+            while (true)
+            {
+                key = Console.ReadKey();
+                switch (key.Key)
+                {
+                    case ConsoleKey.D1: return MainUserActions.CreateWarehouse;
+                    case ConsoleKey.D2: return MainUserActions.WarehouseActions;
+                    case ConsoleKey.D3: return MainUserActions.DeleteWarehouse;
+                    case ConsoleKey.Q: return MainUserActions.Exit;
+                }
+            }
+        }
+
+        /// <summary>
+        /// asks user to input a integer number
+        /// </summary>
+        /// <returns>integer number</returns>
+        public static int AskForInt()
+        {
+            Match match = intRegex.Match(Console.ReadLine());
+            while (!match.Success)
+            {
+                Console.WriteLine("Введите натуральное число");
+                match = intRegex.Match(Console.ReadLine());
+            }
+            return Int32.Parse(match.Value);
+        }
+
+        /// <summary>
+        /// asks user to input a decimal number
+        /// </summary>
+        /// <returns>decimal number</returns>
+        public static decimal AskForDecimal()
+        {
+            Match match = decimalRegex.Match(Console.ReadLine());
+            while (!match.Success)
+            {
+                Console.WriteLine("Введите положительное десятичное число:");
+                match = decimalRegex.Match(Console.ReadLine());
+            }
+            return Decimal.Parse(match.Value);
+        }
+
+    }
+}
