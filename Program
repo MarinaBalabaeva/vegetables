@@ -1,0 +1,232 @@
+using System;
+
+namespace Ovoshi
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            Warehouse currentWarehouse = null;
+            BoxContainer currentBoxContainer = null;
+            Sequence boxesSequence = new Sequence();
+            Sequence containersSequence = new Sequence();
+
+            while (true)
+            {
+                Console.Clear();
+                MainMenu.ShowTitle();
+                MainUserActions mainChoice = MainMenu.ShowMainMenu();
+                switch (mainChoice)
+                {
+                    case MainUserActions.CreateWarehouse:
+                        {
+                            if (!(currentWarehouse == null))
+                            {
+                                Console.WriteLine();
+                                Console.WriteLine("У вас уже есть склад. Для работы с другим складом удалите предыдущий.");
+                                Console.WriteLine("Нажмите любую кнопку для продолжения.");
+                                Console.ReadKey();
+                                break;
+                            }
+                            boxesSequence.Reset();
+                            containersSequence.Reset();
+                            Console.WriteLine();
+                            Console.WriteLine("Введите максимальную вместимость (измеряется в контейнерах):");
+                            int maxCapacity = MainMenu.AskForInt();
+                            Console.WriteLine("Введите плату за хранение контейнера:");
+                            decimal fee = MainMenu.AskForDecimal();
+                            currentWarehouse = new Warehouse(maxCapacity, fee);
+                            Console.WriteLine("Склад создан.");
+                            Console.WriteLine("Нажмите любую кнопку для продолжения.");
+                            Console.ReadKey();
+                            break;
+                        }
+                    case MainUserActions.DeleteWarehouse:
+                        {
+                            Console.WriteLine();
+                            currentWarehouse = null;
+                            containersSequence.Reset();
+                            boxesSequence.Reset();
+                            Console.WriteLine("Склад удален.");
+                            Console.WriteLine("Нажмите любую кнопку для продолжения.");
+                            Console.ReadKey();
+                            break;
+                        }
+                    case MainUserActions.Exit:
+                        {
+                            Console.WriteLine();
+                            Console.WriteLine("Программа завершена. Нажмите любую кнопку для выхода.");
+                            Console.ReadKey();
+                            return;
+                        }
+                    case MainUserActions.WarehouseActions:
+                        {
+                            if (currentWarehouse == null)
+                            {
+                                Console.WriteLine();
+                                Console.WriteLine("Склад не создан. Для начала создайте склад.");
+                                Console.WriteLine("Нажмите любую клавишу для продолжения.");
+                                Console.ReadKey();
+                                break;
+                            }
+                            HandleWarehouse(currentWarehouse, currentBoxContainer, containersSequence, boxesSequence);
+                            break;
+
+                        }
+                }
+            }
+        }
+
+
+        public static void HandleContainer(Warehouse w, BoxContainer c, Sequence boxesSequence)
+        {
+            boxesSequence.Reset();
+            while (true)
+            {
+                Console.Clear();
+                ContainerUserActions containerChoice = BoxContainerMenu.ShowBoxContainerMenu();
+                switch (containerChoice)
+                {
+                    case ContainerUserActions.AddBox:
+                        {
+                            Console.WriteLine();
+                            Console.WriteLine("Введите массу ящика:");
+                            decimal mass = MainMenu.AskForDecimal();
+                            Console.WriteLine("Введите цену за килограмм:");
+                            decimal pricePerKg = MainMenu.AskForDecimal();
+                            Box box = new Box(mass, pricePerKg, boxesSequence.Next());
+                            c.AddBox(box);
+                            Console.WriteLine(c.GetLastLog());
+                            Console.WriteLine("Нажмите любую кнопку для продолжения.");
+                            Console.ReadKey();
+                            break;
+                        }
+                    case ContainerUserActions.RemoveBox:
+                        {
+                            Console.WriteLine();
+                            Console.WriteLine("Введите номер удаляемой коробки:");
+                            int number = MainMenu.AskForInt();
+                            c.DeleteBox(number);
+                            Console.WriteLine(c.GetLastLog());
+                            Console.WriteLine("Нажмите любую кнопку для продолжения.");
+                            Console.ReadKey();
+                            break;
+                        }
+                    case ContainerUserActions.ShowLogs:
+                        {
+                            Console.Clear();
+                            Console.WriteLine("ЛОГ ДОБАВЛЕНИЙ И УДАЛЕНИЙ ЯЩИКОВ");
+                            Console.WriteLine();
+                            string[] logs = c.GetLogs();
+                            foreach (string log in logs)
+                            {
+                                Console.WriteLine(log);
+                            }
+                            Console.WriteLine();
+                            Console.WriteLine("Нажмите любую клавишу для продолжения.");
+                            Console.ReadKey();
+                            break;
+                        }
+                    case ContainerUserActions.ShowBoxes:
+                        {
+                            Console.Clear();
+                            Console.WriteLine("СПИСОК ХРАНИМЫХ ЯЩИКОВ");
+                            Console.WriteLine();
+                            foreach (Box box in c.Boxes)
+                            {
+                                Console.WriteLine($"Ящик №{box.Number}: {box.Mass} килограмм, {box.Price} рублей.");
+                            }
+                            Console.WriteLine();
+                            Console.WriteLine("Нажмите любую клавишу для продолжения.");
+                            Console.ReadKey();
+                            break;
+                        }
+                    case ContainerUserActions.ShowMaxMass:
+                        {
+                            Console.WriteLine();
+                            Console.WriteLine($"Максимальная масса контейнера: {c.MaxMass}");
+                            Console.WriteLine("Нажмите любую клавишу для продолжения.");
+                            Console.ReadKey();
+                            break;
+                        }
+                    case ContainerUserActions.SealAndExit:
+                        {
+                            Console.WriteLine();
+                            c.Seal();
+                            w.AddBoxContainer(c);
+                            Console.WriteLine("Контейнер запечатан и положен на склад.");
+                            Console.WriteLine("Нажмите любую кнопку для продолжения:");
+                            Console.ReadKey();
+                            return;
+                        }
+                }
+            }
+        }
+
+        public static void HandleWarehouse(Warehouse currentWarehouse, BoxContainer currentBoxContainer, Sequence containersSequence, Sequence boxesSequence)
+        {
+            while (true)
+            {
+                Console.Clear();
+                WarehouseUserActions warehouseChoice = WarehouseMenu.ShowMenu();
+                switch (warehouseChoice)
+                {
+                    case WarehouseUserActions.AddContainer:
+                        {
+                            currentBoxContainer = new BoxContainer(containersSequence.Next());
+                            HandleContainer(currentWarehouse, currentBoxContainer, boxesSequence);
+                            break;
+
+                        }
+                    case WarehouseUserActions.RemoveContainer:
+                        {
+                            Console.WriteLine();
+                            Console.WriteLine("Введите номер удаляемого контейнера:");
+                            int number = MainMenu.AskForInt();
+                            currentWarehouse.RemoveContainer(number);
+                            Console.WriteLine(currentWarehouse.GetLastLog());
+                            Console.WriteLine("Нажмите любую клавишу для продолжения.");
+                            Console.ReadKey();
+                            break;
+                        }
+                    case WarehouseUserActions.ShowLogs:
+                        {
+                            Console.Clear();
+                            Console.WriteLine("ЛОГИ ДОБАВЛЕНИЯ И УДАЛЕНИЯ КОНТЕЙНЕРОВ");
+                            Console.WriteLine();
+                            string[] logs = currentWarehouse.GetLogs();
+                            foreach (string log in logs)
+                            {
+                                Console.WriteLine(log);
+                            }
+                            Console.WriteLine();
+                            Console.WriteLine("Нажмите любую клавишу для продолжения.");
+                            Console.ReadKey();
+                            break;
+                        }
+                    case WarehouseUserActions.ShowContainers:
+                        {
+                            Console.Clear();
+                            Console.WriteLine("СПИСОК ХРАНИМЫХ НА СКЛАДЕ КОНТЕЙНЕРОВ");
+                            Console.WriteLine();
+                            foreach (BoxContainer c in currentWarehouse.Containers)
+                            {
+                                Console.WriteLine($"Контейнер №{c.Number}: {c.Mass} килограмм из {c.MaxMass}, {c.Price} рублей, {c.Corruption} - доля порченности.");
+                            }
+                            Console.WriteLine();
+                            Console.WriteLine("Нажмите любую клавишу для продолжения.");
+                            Console.ReadKey();
+                            break;
+                        }
+                    case WarehouseUserActions.Exit:
+                        {
+                            Console.WriteLine();
+                            Console.WriteLine("Работа завершена. Нажмите любую клавишу для продолжения.");
+                            Console.ReadKey();
+                            return;
+                        }
+                }
+            }
+        }
+    }
+}
