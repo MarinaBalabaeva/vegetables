@@ -1,0 +1,38 @@
+using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace Ovoshi
+{
+    public class WarehouseMenu
+    {
+        /// <summary>
+        /// menu of actions possible to be done inside a warehouse
+        /// </summary>
+        /// <returns>chosen action (enum)</returns>
+        public static WarehouseUserActions ShowMenu()
+        {
+            Console.WriteLine("МЕНЮ РАБОТЫ С КОНТЕЙНЕРАМИ НА СКЛАДЕ");
+            Console.WriteLine();
+            Console.WriteLine("1. Создать контейнер;");
+            Console.WriteLine("2. Удалить контейнер;");
+            Console.WriteLine("3. Показать лог добавлений и удалений контейнеров;");
+            Console.WriteLine("4. Показать список контейнеров на складе;");
+            Console.WriteLine("Q. Выход.");
+            Console.WriteLine("Введите выбранное действие:");
+            ConsoleKeyInfo key;
+            while (true)
+            {
+                key = Console.ReadKey();
+                switch (key.Key)
+                {
+                    case ConsoleKey.D1: return WarehouseUserActions.AddContainer;
+                    case ConsoleKey.D2: return WarehouseUserActions.RemoveContainer;
+                    case ConsoleKey.D3: return WarehouseUserActions.ShowLogs;
+                    case ConsoleKey.D4: return WarehouseUserActions.ShowContainers;
+                    case ConsoleKey.Q: return WarehouseUserActions.Exit;
+                }
+            }
+        }
+    }
+}
