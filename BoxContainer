@@ -1,0 +1,209 @@
+using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace Ovoshi
+{
+    public class BoxContainer
+    {
+        private bool isOpen = true;
+        private Dictionary<Int32, Box> boxes;
+        private int number; //?
+        private decimal corruption;
+        private decimal maxMass;
+        private decimal mass; //?
+        private decimal price; //?
+        private List<string> logs; //tell about them
+
+        public BoxContainer(int number)
+        {
+            Random rand = new Random();
+            boxes = new Dictionary<int, Box>(); //cuz irl we find boxes not by their indexes but by their keys like individual numbers or whatever u consider a key
+            this.number = number;
+            price = 0;
+            corruption = 0;
+            mass = 0;
+            maxMass = rand.Next(10, 101);
+            logs = new List<string>();
+        }
+
+        public int Number
+        {
+            get
+            {
+                return number;
+            }
+        }
+
+        public decimal Price
+        {
+            get
+            {
+                return price * (1 - corruption);
+            }
+        }
+
+        public decimal Corruption
+        {
+            get
+            {
+                return corruption;
+            }
+        }
+
+        public bool IsOpen
+        {
+            get
+            {
+                return isOpen;
+            }
+        }
+
+        public decimal Mass
+        {
+            get
+            {
+                return mass;
+            }
+        }
+
+        public decimal MaxMass
+        {
+            get
+            {
+                return maxMass;
+            }
+        }
+
+        /// <summary>
+        /// adds a box in the container
+        /// </summary>
+        /// <param name="box"></param>
+        /// <returns></returns>
+        public bool AddBox(Box box)
+        {
+            if (!IsOpen) //if the container is sealed. Useless in this version (cuz we cant work with several containers at once and access them after creation) so just for paranoia
+            {
+                logs.Add($"Ящик №{box.Number} не был добавлен: контейнер запечатан.");
+                return false;
+            }
+            if (boxes.ContainsKey(box.Number)) //if this box already here. Just for paranoia too
+            {
+                logs.Add($"Ящик №{box.Number} не был добавлен: ящик с таким номером уже присутствует в контейнере.");
+                return false;
+            }
+            if (mass + box.Mass > maxMass) //if the addition would cause an overweight
+            {
+                logs.Add($"Ящик №{box.Number} не был добавлен: добавление повлекло бы перевес в контейнере.");
+                return false;
+            }
+            boxes.Add(box.Number, box); //adds the box into the dictionary of boxes
+            mass += box.Mass;
+            price += box.Price;
+            logs.Add($"Ящик №{box.Number} был добавлен в контейнер.");
+            return true;
+        }
+
+        /// <summary>
+        /// deletes the box from the container
+        /// </summary>
+        /// <param name="box">the box to delete</param>
+        /// <returns>whether it was deleted or not</returns>
+        public bool DeleteBox(Box box)
+        {
+            return DeleteBox(box.Number);
+        }
+
+        /// <summary>
+        /// deletes the box defined by its number from the container
+        /// </summary>
+        /// <param name="number">number of the needed box</param>
+        /// <returns>whether is was deleted or not</returns>
+        public bool DeleteBox(int number)
+        {
+            if (!IsOpen) //if the container is sealed. Just for paranoia cuz in this version of the programme we cant access containers after they are created
+            {
+                logs.Add($"Ящик №{number} не был удален из контейнера: контейнер запечатан.");
+                return false;
+            }
+            if (!boxes.ContainsKey(number)) //if there is no box with such number. For paranoia too
+            {
+                logs.Add($"Ящик №{number} не был удален из контейнера: ящика с таким номером не было в контейнере.");
+                return false;
+            }
+            Box box = boxes[number]; //finds the box by its number in the dictionary
+            boxes.Remove(number);
+            mass -= box.Mass;
+            price -= box.Price;
+            logs.Add($"Ящик №{number} был удален из контейнера.");
+            return true;
+        }
+
+        /// <summary>
+        /// gets a list of boxes
+        /// </summary>
+        public List<Box> Boxes
+        {
+            get
+            {
+                return new List<Box>(boxes.Values);
+            }
+        }
+
+        /// <summary>
+        /// gets an amount of boxes. Kinda useless for now but let it be
+        /// </summary>
+        public int Count
+        {
+            get
+            {
+                return boxes.Count;
+            }
+        }
+
+        /// <summary>
+        /// seals a container
+        /// </summary>
+        /// <returns>whether it was sealed or not</returns>
+        public bool Seal()
+        {
+            if (IsOpen)
+            {
+                isOpen = false;
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// corrupts a container
+        /// </summary>
+        /// <param name="corruption">the degree of corruption</param>
+        public void Corrupt(decimal corruption)
+        {
+            this.corruption = corruption;
+        }
+
+        /// <summary>
+        /// gets the last log from list of logs
+        /// </summary>
+        /// <returns>the last log</returns>
+        public string GetLastLog()
+        {
+            return logs.Count == 0 ? null : logs[logs.Count - 1];
+        }
+
+        /// <summary>
+        /// turns list of logs into an array
+        /// </summary>
+        /// <returns>array of logs</returns>
+        public string[] GetLogs()
+        {
+            return logs.ToArray();
+        }
+
+    }
+}
